@@ -87,26 +87,38 @@
             white-space: pre;
         }
 
-        .copy-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn, .download-btn {
             background: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
-            z-index: 10;
+        }
+
+        .download-btn {
+            background: #27ae60;
         }
 
         .copy-btn:hover {
             background: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .download-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
         }
 
         .copy-btn.copied {
@@ -192,6 +204,41 @@
         .no-jobs p {
             color: #868e96;
         }
+
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -208,20 +255,20 @@
         <div class="instructions">
             <h3>📝 How to Update Your Public Website</h3>
             <ol>
-                <li><strong>Click "Copy Code"</strong> button below to copy the generated JavaScript code</li>
-                <li><strong>Open your project:</strong> <code>public-website/js/jobData.js</code></li>
-                <li><strong>Select all existing code:</strong> Press <code>Ctrl+A</code> (or <code>Cmd+A</code> on Mac)</li>
-                <li><strong>Paste the new code:</strong> Press <code>Ctrl+V</code> (or <code>Cmd+V</code> on Mac)</li>
-                <li><strong>Save the file:</strong> Press <code>Ctrl+S</code> (or <code>Cmd+S</code> on Mac)</li>
-                <li><strong>Upload to Netlify:</strong> Upload your <code>public-website</code> folder</li>
+                <li><strong>Option 1 (Easy):</strong> Click "💾 Download jobData.js" button below</li>
+                <li><strong>Option 2:</strong> Click "📋 Copy Code" button to copy the code manually</li>
+                <li><strong>Navigate to:</strong> <code>public-website/js/jobData.js</code></li>
+                <li><strong>If downloading:</strong> Replace the file with the downloaded one</li>
+                <li><strong>If copying:</strong> Select all (Ctrl+A), paste (Ctrl+V), save (Ctrl+S)</li>
+                <li><strong>Upload to Netlify:</strong> Deploy your updated <code>public-website</code> folder</li>
             </ol>
         </div>
 
         <div class="warning-box">
             <strong>⚠️ Important:</strong>
-            This code must be pasted into: <code>public-website/js/jobData.js</code>
+            This code must replace the content of: <code>public-website/js/jobData.js</code>
             <br><br>
-            <strong>Remember:</strong> Ctrl+A (select all) → Ctrl+V (paste) → Ctrl+S (save)
+            <strong>Note:</strong> This is the PUBLIC version (read-only). Your admin panel uses a different version with localStorage.
         </div>
 
         <div id="contentArea"></div>
@@ -233,9 +280,8 @@
             const contentArea = document.getElementById('contentArea');
             const statsBox = document.getElementById('statsBox');
 
-            // First try to get jobs from localStorage, if not available use the default jobs
-            const localJobs = localStorage.getItem('admin_jobs');
-            const jobs = localJobs ? JSON.parse(localJobs) : jobDataManager.getAllJobs();
+            // Get jobs from the jobDataManager
+            const jobs = jobDataManager.getAllJobs();
 
             if (jobs.length === 0) {
                 statsBox.innerHTML = '';
@@ -271,7 +317,7 @@
                 </div>
             `;
 
-            const generatedCode = generateJobDataCode(jobs);
+            const generatedCode = generatePublicJobDataCode(jobs);
 
             contentArea.innerHTML = `
                 <div class="code-section">
@@ -287,26 +333,31 @@
                     <div class="code-box">
                         <pre><code>${escapeHtml(generatedCode)}</code></pre>
                     </div>
-                    <div class="instructions" style="margin-top: 20px;">
-                        <strong>📝 After downloading:</strong>
+                    <div class="instructions" style="margin-top: 20px; background: #d4edda; border-left-color: #28a745;">
+                        <strong>✅ After downloading or copying:</strong>
                         <ol style="margin-top: 10px;">
-                            <li>Copy the downloaded file to: <code>public-website/js/jobData.js</code></li>
-                            <li>Replace the existing file</li>
-                            <li>The changes will work both locally and on Netlify! 🎉</li>
+                            <li>Replace <code>public-website/js/jobData.js</code> with this file</li>
+                            <li>This is a READ-ONLY version for your public website</li>
+                            <li>Always edit jobs from the Admin Panel, not this file</li>
+                            <li>Upload to Netlify and your changes will be live! 🎉</li>
                         </ol>
                     </div>
                 </div>
             `;
         });
 
-        function generateJobDataCode(jobs) {
+        function generatePublicJobDataCode(jobs) {
             const blogPosts = window.AVAILABLE_BLOG_POSTS || [];
             
+            // Generate the PUBLIC VERSION (read-only, embedded data)
             const code = `// Job Data Management System - PUBLIC VERSION (embedded data)
+// ⚠️ DO NOT EDIT THIS FILE MANUALLY
+// This file is auto-generated from the Admin Panel
+// To update jobs, use the Admin Panel at: admin-panel/admin.html
 
 // ===== AUTO-GENERATED: DO NOT EDIT MANUALLY =====
 window.AVAILABLE_BLOG_POSTS = [
-    "${blogPosts.join('",\n    "')}"
+    ${blogPosts.map(post => `"${post}"`).join(',\n    ')}
 ];
 // ===== END AUTO-GENERATED =====
 
@@ -330,10 +381,15 @@ class JobDataManager {
     }
 
     isJobActive(lastDate) {
-        return new Date(lastDate) >= new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const jobDate = new Date(lastDate);
+        jobDate.setHours(0, 0, 0, 0);
+        return jobDate >= today;
     }
 }
 
+// Initialize the job data manager
 const jobDataManager = new JobDataManager();`;
 
             return code;
@@ -377,7 +433,7 @@ const jobDataManager = new JobDataManager();`;
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
             
-            showToast('✨ jobData.js downloaded successfully!');
+            showToast('✨ jobData.js downloaded successfully! Replace the file in public-website/js/');
         }
 
         function copyCode(button) {
@@ -387,7 +443,7 @@ const jobDataManager = new JobDataManager();`;
                 const originalText = button.textContent;
                 button.textContent = '✓ Copied!';
                 button.classList.add('copied');
-                showToast('📋 Code copied to clipboard!');
+                showToast('📋 Code copied! Paste it into public-website/js/jobData.js');
 
                 setTimeout(() => {
                     button.textContent = originalText;
