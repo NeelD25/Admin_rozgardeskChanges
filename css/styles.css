@@ -1,0 +1,465 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Layout */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 300;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Last Updated */
+.last-updated {
+    background: #3498db;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* Statistics */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #3498db;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Controls */
+.controls {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto auto;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-box, .filter-select {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background: white;
+}
+
+.search-box:focus, .filter-select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.refresh-btn, .admin-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background 0.3s ease;
+    white-space: nowrap;
+}
+
+.refresh-btn:hover, .admin-btn:hover {
+    background: #2980b9;
+}
+
+.refresh-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.admin-btn {
+    background: #e74c3c;
+}
+
+.admin-btn:hover {
+    background: #c0392b;
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #7f8c8d;
+}
+
+.spinner {
+    border: 4px solid #ecf0f1;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Jobs Table */
+.jobs-table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.jobs-table th {
+    background: #34495e;
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.jobs-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #ecf0f1;
+    vertical-align: top;
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+.jobs-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.jobs-table tr:hover {
+    background: #e8f4f8;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Job Table Cell Styles */
+.job-title {
+    font-weight: 600;
+    color: #2c3e50;
+    max-width: 250px;
+}
+
+.job-posts {
+    font-weight: 600;
+    color: #27ae60;
+    text-align: center;
+}
+
+.department {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.location {
+    color: #8e44ad;
+    font-weight: 500;
+}
+
+.age-limit {
+    color: #f39c12;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.qualification {
+    color: #34495e;
+    font-size: 0.9rem;
+}
+
+.apply-link, .view-details-btn {
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.apply-link:hover, .view-details-btn:hover {
+    background: #2980b9;
+}
+
+.view-details-btn {
+    background: #9b59b6;
+}
+
+.view-details-btn:hover {
+    background: #8e44ad;
+}
+
+.last-date {
+    color: #e74c3c;
+    font-weight: 500;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.last-date.urgent {
+    background: #ffebee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { background: #ffebee; }
+    50% { background: #ffcdd2; }
+    100% { background: #ffebee; }
+}
+
+.details-btn {
+    background: #9b59b6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s ease;
+}
+
+.details-btn:hover {
+    background: #8e44ad;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    max-height: 80vh;
+    width: 90%;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #e74c3c;
+}
+
+.modal h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.modal-detail {
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.modal-detail:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: #7f8c8d;
+    line-height: 1.6;
+}
+
+/* Error and No Jobs Messages */
+.error-message {
+    background: #e74c3c;
+    color: white;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.no-jobs {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    font-size: 18px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .controls {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+    }
+
+    .jobs-table th, .jobs-table td {
+        padding: 8px 6px;
+        font-size: 14px;
+    }
+
+    .jobs-table {
+        min-width: 800px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+        max-height: 90vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 20px 15px;
+    }
+
+    .header h1 {
+        font-size: 1.5rem;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .jobs-table th, .jobs-table td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+}
