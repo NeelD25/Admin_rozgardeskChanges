@@ -6,27 +6,29 @@ window.AVAILABLE_BLOG_POSTS = [
     "DSSSBPRT.html",
     "ssc_cpo.html",
     "RRBNTPC_ShortNotice.html",
-    "ddd.html"
+    "frg.html"
 ];
 // ===== END AUTO-GENERATED =====
 
 class JobDataManager {
     constructor() {
         this.storageKey = 'admin_jobs';
-        this.versionKey = 'admin_jobs_version';
-        this.currentVersion = '1.1'; // Increment this to force refresh default jobs
         this.availableBlogPosts = window.AVAILABLE_BLOG_POSTS || [];
         this.jobs = [];
+        this.isInitialized = false;
         this.init();
     }
 
     init() {
-        // Check if we need to update default jobs
-        const storedVersion = localStorage.getItem(this.versionKey);
+        if (this.isInitialized) {
+            console.warn('JobDataManager already initialized');
+            return;
+        }
+
+        // Load from localStorage first
         const stored = localStorage.getItem(this.storageKey);
         
-        if (stored && storedVersion === this.currentVersion) {
-            // Load existing jobs if version matches
+        if (stored) {
             try {
                 this.jobs = JSON.parse(stored);
                 console.log(`✓ Loaded ${this.jobs.length} jobs from localStorage`);
@@ -36,13 +38,13 @@ class JobDataManager {
                 this.saveToStorage();
             }
         } else {
-            // Version mismatch or no stored data - use default jobs
-            console.log('🔄 Refreshing with updated default jobs...');
+            // First time - use default jobs
             this.jobs = this.getDefaultJobs();
-            localStorage.setItem(this.versionKey, this.currentVersion);
             this.saveToStorage();
             console.log(`✓ Initialized with ${this.jobs.length} default jobs`);
         }
+
+        this.isInitialized = true;
     }
 
     getDefaultJobs() {
@@ -113,9 +115,10 @@ class JobDataManager {
     saveToStorage() {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(this.jobs));
+            console.log('💾 Saved to localStorage');
             return true;
         } catch (e) {
-            console.error('Error saving to localStorage:', e);
+            console.error('❌ Error saving to localStorage:', e);
             return false;
         }
     }
@@ -129,60 +132,120 @@ class JobDataManager {
     }
 
     addJob(jobData) {
-        const newJob = {
-            ...jobData,
-            id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            postedDate: new Date().toISOString().split('T')[0],
-            status: this.isJobActive(jobData.lastDate) ? 'active' : 'expired'
-        };
+        try {
+            const newJob = {
+                title: jobData.title,
+                department: jobData.department,
+                posts: parseInt(jobData.posts) || 0,
+                location: jobData.location,
+                minAge: jobData.minAge ? parseInt(jobData.minAge) : null,
+                maxAge: jobData.maxAge ? parseInt(jobData.maxAge) : null,
+                qualification: jobData.qualification,
+                lastDate: jobData.lastDate,
+                blogPost: jobData.blogPost,
+                description: jobData.description || '',
+                id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                postedDate: new Date().toISOString().split('T')[0],
+                status: this.isJobActive(jobData.lastDate) ? 'active' : 'expired'
+            };
 
-        this.jobs.unshift(newJob);
-        this.saveToStorage();
-        console.log('✓ Job added:', newJob.title);
-        return newJob;
+            this.jobs.unshift(newJob);
+            const saved = this.saveToStorage();
+            
+            if (saved) {
+                console.log('✓ Job added successfully:', newJob.title);
+                return newJob;
+            } else {
+                throw new Error('Failed to save to storage');
+            }
+        } catch (error) {
+            console.error('❌ Error in addJob:', error);
+            throw error;
+        }
     }
 
     updateJob(id, updates) {
-        const index = this.jobs.findIndex(job => job.id === id);
-        if (index === -1) {
-            console.error('Job not found:', id);
-            return null;
+        try {
+            const index = this.jobs.findIndex(job => job.id === id);
+            if (index === -1) {
+                console.error('❌ Job not found:', id);
+                return null;
+            }
+
+            // Create updated job object with proper data types
+            const updatedJob = {
+                ...this.jobs[index],
+                title: updates.title,
+                department: updates.department,
+                posts: parseInt(updates.posts) || 0,
+                location: updates.location,
+                minAge: updates.minAge ? parseInt(updates.minAge) : null,
+                maxAge: updates.maxAge ? parseInt(updates.maxAge) : null,
+                qualification: updates.qualification,
+                lastDate: updates.lastDate,
+                blogPost: updates.blogPost,
+                description: updates.description || '',
+                status: this.isJobActive(updates.lastDate) ? 'active' : 'expired'
+            };
+
+            this.jobs[index] = updatedJob;
+            const saved = this.saveToStorage();
+            
+            if (saved) {
+                console.log('✓ Job updated successfully:', updatedJob.title);
+                return updatedJob;
+            } else {
+                throw new Error('Failed to save to storage');
+            }
+        } catch (error) {
+            console.error('❌ Error in updateJob:', error);
+            throw error;
         }
-
-        this.jobs[index] = {
-            ...this.jobs[index],
-            ...updates,
-            status: this.isJobActive(updates.lastDate) ? 'active' : 'expired'
-        };
-
-        this.saveToStorage();
-        console.log('✓ Job updated:', this.jobs[index].title);
-        return this.jobs[index];
     }
 
     deleteJob(id) {
-        const index = this.jobs.findIndex(job => job.id === id);
-        if (index === -1) {
-            console.error('Job not found:', id);
+        try {
+            const index = this.jobs.findIndex(job => job.id === id);
+            if (index === -1) {
+                console.error('❌ Job not found:', id);
+                return false;
+            }
+
+            const deletedJob = this.jobs.splice(index, 1)[0];
+            const saved = this.saveToStorage();
+            
+            if (saved) {
+                console.log('✓ Job deleted successfully:', deletedJob.title);
+                return true;
+            } else {
+                throw new Error('Failed to save to storage');
+            }
+        } catch (error) {
+            console.error('❌ Error in deleteJob:', error);
             return false;
         }
-
-        const deletedJob = this.jobs.splice(index, 1)[0];
-        this.saveToStorage();
-        console.log('✓ Job deleted:', deletedJob.title);
-        return true;
     }
 
     deleteJobs(ids) {
-        const idsSet = new Set(ids);
-        const beforeCount = this.jobs.length;
-        
-        this.jobs = this.jobs.filter(job => !idsSet.has(job.id));
-        
-        const deletedCount = beforeCount - this.jobs.length;
-        this.saveToStorage();
-        console.log(`✓ Deleted ${deletedCount} jobs`);
-        return deletedCount;
+        try {
+            const idsSet = new Set(ids);
+            const beforeCount = this.jobs.length;
+            
+            this.jobs = this.jobs.filter(job => !idsSet.has(job.id));
+            
+            const deletedCount = beforeCount - this.jobs.length;
+            const saved = this.saveToStorage();
+            
+            if (saved) {
+                console.log(`✓ Deleted ${deletedCount} jobs successfully`);
+                return deletedCount;
+            } else {
+                throw new Error('Failed to save to storage');
+            }
+        } catch (error) {
+            console.error('❌ Error in deleteJobs:', error);
+            return 0;
+        }
     }
 
     isJobActive(lastDate) {
@@ -200,7 +263,22 @@ class JobDataManager {
             status: this.isJobActive(job.lastDate) ? 'active' : 'expired'
         }));
     }
+
+    // Clear all data (for debugging)
+    clearAllData() {
+        localStorage.removeItem(this.storageKey);
+        this.jobs = this.getDefaultJobs();
+        this.saveToStorage();
+        console.log('🔄 Reset to default jobs');
+        return true;
+    }
 }
 
-// Initialize the job data manager
+// Initialize the job data manager - single instance
 const jobDataManager = new JobDataManager();
+
+// Make it globally accessible for debugging
+window.jobDataManager = jobDataManager;
+
+// Debug helper - type this in console if needed: jobDataManager.clearAllData()
+console.log('💡 Debug: Type "jobDataManager.clearAllData()" in console to reset all jobs');
